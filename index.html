@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Data Mahasiswa</title>
+</head>
+<body>
+  <h1>Daftar Mahasiswa</h1>
+  <ul id="list-mahasiswa"></ul>
+
+  <h2>Tambah Mahasiswa</h2>
+  <form id="form-mahasiswa">
+    <input type="text" placeholder="Nama" name="nama" required>
+    <input type="text" placeholder="NIM" name="nim" required>
+    <input type="text" placeholder="Prodi" name="prodi" required>
+    <button type="submit">Tambah</button>
+  </form>
+
+  <script>
+    const API_URL = 'http://localhost:3000/mahasiswa';
+
+    // Ambil dan tampilkan data mahasiswa
+    function loadMahasiswa() {
+      fetch(API_URL)
+        .then(res => res.json())
+        .then(data => {
+          const list = document.getElementById('list-mahasiswa');
+          list.innerHTML = '';
+          data.forEach(mhs => {
+            const item = document.createElement('li');
+            item.textContent = `${mhs.nama} (${mhs.nim}) - ${mhs.prodi}`;
+            list.appendChild(item);
+          });
+        });
+    }
+
+    // Tambah data mahasiswa
+    document.getElementById('form-mahasiswa').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const formData = new FormData(this);
+      const data = {
+        nama: formData.get('nama'),
+        nim: formData.get('nim'),
+        prodi: formData.get('prodi')
+      };
+
+      fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(() => {
+        this.reset();
+        loadMahasiswa(); // Refresh list
+      });
+    });
+
+    loadMahasiswa();
+  </script>
+</body>
+</html>
